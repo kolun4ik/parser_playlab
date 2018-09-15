@@ -20,16 +20,44 @@ class PlayLabParser:
         self.path = path
         self.project = project
         self.page = ''
-        print(self.get_html(self.url))
+        self.get_catalog(self.url)
 
 
     def get_html(self, url):
         # получаем по url исходный код страницы на html
         user_agent = UserAgent()
         self.page = requests.get(self.url, headers={'user-agent': user_agent.chrome})
-        return self.page.text
+        if self.page.status_code == 200:
+            return self.page.text
+        else:
+            return None
 
 
+    def get_catalog(self, url):
+        # ищем на странице ul с классом "root" и проходим по всем элементам списка:
+        # <ul class="root">
+        #     <li>
+        #         <a href="#">name</a>
+        #         <div class="cat_pic"><img src="#" alt=""></div>
+        #     </li>
+        #     <li class="parent">
+        #         <a href="#">name</a>
+        #         <div class="cat_pic"><img src="#" alt=""></div>
+        #         <ul>
+        #             <li>
+        #                 <a href="#">name</a>
+        #                 <div class="cat_pic"><img src="" alt=""></div>
+        #             </li>
+        #         </ul>
+        #     </li>
+        # </ul>
+        # Помещаем данные в словарь. Формируем список словарей:
+        # [{'name': name, 'url': url, 'image': img, 'categiry': category}]
+        # Подсказка: http://wiki.python.su/%D0%94%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D0%B8/BeautifulSoup
+        html = self.get_html(url)
+        if html is not None:
+            soup = BeautifulSoup(html, 'lxml')
+            print(soup('ul', class_='root').nextsibling)
 
 if __name__ == '__main__':
     app = PlayLabParser()
