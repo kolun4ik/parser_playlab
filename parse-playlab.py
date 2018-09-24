@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 import requests
 
 
+
 class PlayLabParser:
     def __init__(self, url='https://playlab.ru/toys/', path='', project='Catalog'):
         self.url = url
@@ -57,7 +58,9 @@ class PlayLabParser:
         html = self.get_html(url)
         if html is not None:
             soup = BeautifulSoup(html, 'lxml')
-            print(soup('ul', class_='root').nextsibling)
+            ul_data = soup.find('ul', class_='root').find('ul')
+            print(ul_data)
+
 
 if __name__ == '__main__':
     app = PlayLabParser()
