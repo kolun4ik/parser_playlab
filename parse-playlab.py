@@ -12,6 +12,7 @@
 from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 import requests
+import pdb
 
 
 
@@ -57,9 +58,16 @@ class PlayLabParser:
         # Подсказка: http://wiki.python.su/%D0%94%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D0%B8/BeautifulSoup
         html = self.get_html(url)
         if html is not None:
+            # pdb.set_trace()
             soup = BeautifulSoup(html, 'lxml')
-            ul_data = soup.find('ul', class_='root').find('ul')
-            print(ul_data)
+            # data = soup.find('ul', class_='root').li.ul.children
+            data = soup.find('ul', class_='root').li.ul.contents
+            for punkt in data:
+                if punkt == ' ':
+                    print("njh")
+            with open('catalog.html', 'w', encoding='utf-8') as f:
+                for  punkt in data:
+                    f.write(str(punkt) + '!')
 
 
 if __name__ == '__main__':
