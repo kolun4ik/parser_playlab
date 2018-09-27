@@ -9,18 +9,22 @@
 # 4. Используя данные приложенного файла: сформировать карточки товара, скачать все картинки, прилагаемые к товару и разместить все по соответсвующим категориям каталога.
 # 5. Вести логирование совершенных действий для последующего анализа.
 
-from fake_useragent import UserAgent
-from bs4 import BeautifulSoup
 import requests
 import pdb
+import os
+from fake_useragent import UserAgent
+from bs4 import BeautifulSoup
+from lxml import html
+from pprint import pprint
 
 
 class PlayLabParser:
-    def __init__(self, url='https://playlab.ru/toys/', path='', project='Catalog'):
+    def __init__(self, url='https://playlab.ru/toys/', path='', project='Catalog PlayLab'):
         self.url = url
         self.path = path
         self.project = project
         self.page = ''
+        self.catalog = []
         self.get_catalog(self.url)
 
 
@@ -35,35 +39,29 @@ class PlayLabParser:
 
 
     def get_catalog(self, url):
-        # ищем на странице ul с классом "root" и проходим по всем элементам списка:
-        # <ul class="root">
-        #     <li>
-        #         <a href="#">name</a>
-        #         <div class="cat_pic"><img src="#" alt=""></div>
-        #     </li>
-        #     <li class="parent">
-        #         <a href="#">name</a>
-        #         <div class="cat_pic"><img src="#" alt=""></div>
-        #         <ul>
-        #             <li>
-        #                 <a href="#">name</a>
-        #                 <div class="cat_pic"><img src="" alt=""></div>
-        #             </li>
-        #         </ul>
-        #     </li>
-        # </ul>
+        # ищем на странице ul с классом "root" и проходим по всем элементам списка.
         # Помещаем данные в словарь. Формируем список словарей:
         # [{'name': name, 'url': url, 'image': img, 'categiry': category}]
-        # Подсказка: http://wiki.python.su/%D0%94%D0%BE%D0%BA%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B0%D1%86%D0%B8%D0%B8/BeautifulSoup
-        html = self.get_html(url)
-        if html is not None:
-            # pdb.set_trace()
-            soup = BeautifulSoup(html, 'lxml')
-            data = soup.find('ul', class_='root').li.ul.descendants
+        
+        page_code = self.get_html(url)
 
-            for  punkt in data:
-                print(punkt)
-                print('*'*50)
+        if page_code is not None:
+            soup = BeautifulSoup(page_code, 'lxml')
+            data = soup.find('ul', class_='root').li.ul.contents
+        
+            for punkt in data:
+                if punkt == ' ':
+                    continue
+
+                element = html.fromstring(str(punkt))
+                elements_name = element.xpath('//a/text()')[0]
+                elements_url = element.xpath('//a/@href')[0]
+                elements_image = element.xpath('//img/@src')[0]
+                self.catalog.append({'name': elements_name,
+                                     'url': elements_url,
+                                     'image': elements_image,
+                                     'category': '/'})
+
 
 
 
