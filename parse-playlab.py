@@ -92,7 +92,7 @@ class PlayLabParser:
                 page_desc = soup.find("meta", {"name":"description"})['content']
                 page_title = soup.title.string
                 page_text = soup.find('div', class_='section-description').get_text()
-                pdb.set_trace()
+                
 
                 with open(current_dir + '/page_info.txt', 'w', encoding='utf8') as f_info:
                     data = {'title': page_title,

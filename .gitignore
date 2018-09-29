@@ -3,6 +3,7 @@
 *.pyc
 *.html
 *.xlsx
+*.txt
 *.sublime-project
 *.sublime-workspace
 __pycache__/
